@@ -10,7 +10,7 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     lookup_field = 'username'
     
-    
+    #Пока временно сделал так для создания, т.к. не разобрался еще. Позже заменю.
     def perform_create(self, serializer):
         serializer.save(username=self.request.user.username)
         

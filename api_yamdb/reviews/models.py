@@ -8,7 +8,7 @@ ROLES = (
         ('admin', 'Администратор'),
 )
 
-class MyUser(AbstractUser):
+class CustomUser(AbstractUser):
     bio = models.TextField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=16, choices=ROLES, default='user')
     
