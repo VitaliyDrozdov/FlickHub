@@ -39,7 +39,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_fields = ('category', 'genre', 'name', 'year')
 
 
-class AbstractCategoryGenreViewSet(
+class CategoryGenreViewSet(
     mixins.CreateModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
@@ -49,12 +49,12 @@ class AbstractCategoryGenreViewSet(
     permission_classes = (AdminOrReadOnly,)
 
 
-class CategoryViewSet(AbstractCategoryGenreViewSet):
+class CategoryViewSet(CategoryGenreViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
-class GenreViewSet(AbstractCategoryGenreViewSet):
+class GenreViewSet(CategoryGenreViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
