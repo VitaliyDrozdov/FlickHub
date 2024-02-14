@@ -1,6 +1,7 @@
 from django.core import validators
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 
 ROLES = (
@@ -44,8 +45,7 @@ class Title(models.Model):
     name = models.TextField(max_length=NAMES_MAX_LENGTH)
     year = models.PositiveSmallIntegerField(
         validators=[
-            validators.MinValueValidator(1300),
-            validators.MaxValueValidator(2024),
+            validators.MaxValueValidator(timezone.now().year),
         ],
     )
     rating = models.SmallIntegerField()  # needs change
@@ -56,4 +56,3 @@ class Title(models.Model):
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,
                                  null=True)
-
