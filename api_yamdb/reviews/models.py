@@ -1,5 +1,6 @@
 from django.core import validators
 from django.db import models
+from django.utils import timezone
 
 from reviews.core_models import (
     AbstractReviewModel,
@@ -19,15 +20,14 @@ class Genre(AbstractCategoryGenreModel):
 
 
 class Title(models.Model):
-    name = models.TextField(max_length=NAMES_MAX_LENGTH)
+    name = models.CharField(max_length=NAMES_MAX_LENGTH)
     year = models.PositiveSmallIntegerField(
         validators=[
-            validators.MinValueValidator(1300),
-            validators.MaxValueValidator(2024),
+            validators.MaxValueValidator(timezone.now().year),
         ],
     )
     description = models.TextField(blank=True)
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre, through='GenreTitle')
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True
     )
@@ -35,6 +35,11 @@ class Title(models.Model):
     def get_rating(self):
         rating_avg = self.reviews.aggregate(rating=models.Avg('score'))['rating']
         return 0 if rating_avg is None else int(rating_avg)
+
+
+class GenreTitle(models.Model):
+    title_id = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True)
+    genre_id = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
 
 
 class Review(AbstractReviewModel):

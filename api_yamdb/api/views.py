@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import filters, mixins, permissions, viewsets
+from rest_framework.pagination import PageNumberPagination
 
 from api.serializers import (
     CategorySerializer,
@@ -12,6 +12,7 @@ from api.serializers import (
     ReviewSerializer,
     CommentSerializer,
 )
+from api.permissions import AdminOrReadOnly
 from reviews.models import Category, Genre, Title, Review
 
 User = get_user_model()
@@ -32,23 +33,30 @@ class UserViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageNumberPagination
+    permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryGenreViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    pagination_class = PageNumberPagination
+    permission_classes = (AdminOrReadOnly,)
+
+
+class CategoryViewSet(CategoryGenreViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CategoryGenreViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
