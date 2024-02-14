@@ -28,6 +28,9 @@ class AbstractCategoryGenreModel(models.Model):
         max_length=SLUG_MAX_LENGTH,
     )
 
+    class Meta:
+        abstract = True
+
 
 class Category(AbstractCategoryGenreModel):
     pass
