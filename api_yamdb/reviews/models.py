@@ -1,7 +1,7 @@
 from django.core import validators
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
+
 
 ROLES = (
         ('user', 'Аутентифицированный пользователь'),
@@ -56,3 +56,4 @@ class Title(models.Model):
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,
                                  null=True)
+
