@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
-from .serializers import (
+from api.serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,

@@ -1,7 +1,7 @@
 from django.core import validators
 from django.db import models
 
-from .core_models import (
+from reviews.core_models import (
     AbstractReviewModel,
     AbstractCategoryGenreModel,
     NAMES_MAX_LENGTH,
