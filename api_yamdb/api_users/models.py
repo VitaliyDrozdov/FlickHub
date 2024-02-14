@@ -9,14 +9,16 @@ ROLES = (
 )
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(blank=False, unique=True)
     bio = models.TextField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=16, choices=ROLES, default='user')
+
+    def __str__(self) -> str:
+        return self.username
 
     class Meta:
         verbose_name = ('пользователь')
         verbose_name_plural = ('Пользователи')
-        
-    def __str__(self) -> str:
-        return self.username
+
 
 User = get_user_model()

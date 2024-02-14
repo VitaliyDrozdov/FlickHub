@@ -16,20 +16,21 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     lookup_field = 'username'
     # permission_classes = (IsAdminOnly,)
+
     
-@action(detail=False, methods=['get', 'patch'], url_path='me')
-def get_profile(self, request):
+    @action(detail=False, methods=['get', 'patch'], url_path='me')
+    def get_profile(self, request):
     # permission_classes = (IsAuthenticated,)
-    profile = request.user
-    if request.method == 'GET':
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
-    elif request.method == 'PATCH':
-        serializer = self.get_serializer(profile, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+        profile = request.user
+        if request.method == 'GET':
+            serializer = self.get_serializer(profile)
             return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif request.method == 'PATCH':
+            serializer = self.get_serializer(profile, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # def get_permissions(self):
 #         if self.action != 'get_profile':
