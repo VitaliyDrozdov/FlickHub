@@ -16,7 +16,7 @@ class AbstractReviewModel(models.Model):
 
 
 class AbstractCategoryGenreModel(models.Model):
-    name = models.TextField(max_length=NAMES_MAX_LENGTH)
+    name = models.CharField(max_length=NAMES_MAX_LENGTH)
     slug = models.SlugField(
         unique=True,
         max_length=SLUG_MAX_LENGTH,

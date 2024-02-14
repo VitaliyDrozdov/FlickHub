@@ -20,7 +20,7 @@ class Genre(AbstractCategoryGenreModel):
 
 
 class Title(models.Model):
-    name = models.TextField(max_length=NAMES_MAX_LENGTH)
+    name = models.CharField(max_length=NAMES_MAX_LENGTH)
     year = models.PositiveSmallIntegerField(
         validators=[
             validators.MaxValueValidator(timezone.now().year),
@@ -28,10 +28,15 @@ class Title(models.Model):
     )
     rating = models.SmallIntegerField()  # needs change
     description = models.TextField(blank=True)
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre, through='GenreTitle')
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True
     )
+
+
+class GenreTitle(models.Model):
+    title_id = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True)
+    genre_id = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
 
 
 class Review(AbstractReviewModel):
