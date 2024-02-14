@@ -1,24 +1,13 @@
 from django.core import validators
 from django.db import models
-from django.contrib.auth import get_user_model
 
+from .core_models import (
+    AbstractReviewModel,
+    AbstractCategoryGenreModel,
+    NAMES_MAX_LENGTH,
+)
 
-NAMES_MAX_LENGTH = 256
-SLUG_MAX_LENGTH = 50
 MAX_COMMENT_LENGTH = 50
-
-User = get_user_model()
-
-
-class AbstractCategoryGenreModel(models.Model):
-    name = models.TextField(max_length=NAMES_MAX_LENGTH)
-    slug = models.SlugField(
-        unique=True,
-        max_length=SLUG_MAX_LENGTH,
-    )
-
-    class Meta:
-        abstract = True
 
 
 class Category(AbstractCategoryGenreModel):
@@ -29,13 +18,20 @@ class Genre(AbstractCategoryGenreModel):
     pass
 
 
-class AbstractReviewModel(models.Model):
-    author = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-
-    class Meta:
-        abstract = True
-        ordering = ('-pub_date',)
+class Title(models.Model):
+    name = models.TextField(max_length=NAMES_MAX_LENGTH)
+    year = models.PositiveSmallIntegerField(
+        validators=[
+            validators.MinValueValidator(1300),
+            validators.MaxValueValidator(2024),
+        ],
+    )
+    rating = models.SmallIntegerField()  # needs change
+    description = models.TextField(blank=True)
+    genre = models.ManyToManyField(Genre)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True
+    )
 
 
 class Review(AbstractReviewModel):
@@ -48,7 +44,7 @@ class Review(AbstractReviewModel):
         ],
     )
     title = models.ForeignKey(
-        'Title', verbose_name='Название', on_delete=models.CASCADE
+        Title, verbose_name='Название', on_delete=models.CASCADE
     )
 
     class Meta(AbstractReviewModel.Meta):
@@ -63,24 +59,6 @@ class Review(AbstractReviewModel):
 
     def __str__(self):
         return self.text[:MAX_COMMENT_LENGTH]
-
-
-class Title(models.Model):
-    name = models.TextField(max_length=NAMES_MAX_LENGTH)
-    year = models.PositiveSmallIntegerField(
-        validators=[
-            validators.MinValueValidator(1300),
-            validators.MaxValueValidator(2024),
-        ],
-    )
-    rating = models.SmallIntegerField()  # needs change
-    description = models.TextField(blank=True)
-    genre = models.ManyToManyField(Genre,
-                                   on_delete=models.SET_NULL,
-                                   null=True)
-    category = models.ForeignKey(Category,
-                                 on_delete=models.SET_NULL,
-                                 null=True)
 
 
 class Comment(AbstractReviewModel):
