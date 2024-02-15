@@ -8,26 +8,11 @@ from api.serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,
-    UserSerializer,
     ReviewSerializer,
     CommentSerializer,
 )
 from api.permissions import AdminOrReadOnly
 from reviews.models import Category, Genre, Title, Review
-
-User = get_user_model()
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('username',)
-    lookup_field = 'username'
-
-    # Пока временно сделал так для создания, т.к. не разобрался еще. Позже заменю.
-    def perform_create(self, serializer):
-        serializer.save(username=self.request.user.username)
 
 
 class TitleViewSet(viewsets.ModelViewSet):

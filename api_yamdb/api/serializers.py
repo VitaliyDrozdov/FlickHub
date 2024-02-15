@@ -4,29 +4,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Category, Genre, Title, Review, Comment
-from api_users.models import ROLES
-
-User = get_user_model()
-
-
-# region User
-class UserSerializer(serializers.ModelSerializer):
-    role = serializers.ChoiceField(choices=ROLES)
-
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role',
-        )
-
-
-# endregion
-
 
 # region Titles
 class TitleSerializer(serializers.ModelSerializer):
