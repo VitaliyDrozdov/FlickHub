@@ -31,6 +31,7 @@ class CategoryGenreViewSet(
     search_fields = ('name',)
     pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
+    lookup_field = 'slug'
 
 
 class CategoryViewSet(CategoryGenreViewSet):

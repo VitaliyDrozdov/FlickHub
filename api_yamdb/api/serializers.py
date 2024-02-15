@@ -17,24 +17,24 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
                   'category')
 
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError('год выпуска не может быть'
-                                              'больше текущего')
-        return value
 
+class CategoryGenreSerializer(serializers.ModelSerializer):
 
-class CategorySerializer(serializers.ModelSerializer):
     class Meta:
+        fields = ('id', 'name', 'slug')
+        lookup_field = 'slug'
+
+
+class CategorySerializer(CategoryGenreSerializer):
+
+    class Meta(CategoryGenreSerializer.Meta):
         model = Category
-        fields = ('id', 'name', 'slug')
 
 
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
+class GenreSerializer(CategoryGenreSerializer):
+
+    class Meta(CategoryGenreSerializer.Meta):
         model = Genre
-        fields = ('id', 'name', 'slug')
 
 
 # endregion
