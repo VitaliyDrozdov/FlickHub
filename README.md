@@ -23,7 +23,7 @@ Cоздать и активировать виртуальное окружен�
 
     ```
     python -m venv venv
-    source env/scripts/activate
+    source venv/scripts/activate
     python -m pip install --upgrade pip
     ```
 
