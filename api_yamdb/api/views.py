@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, viewsets
@@ -48,11 +47,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, title=self.get_title())
+
     def get_queryset(self):
-        # return Review.objects.filter(pk=self.kwargs['title_id'])
-        return get_object_or_404(
-            Title, pk=self.kwargs['title_id']
-        ).reviews.all()
+        # return Review.objects.filter(title=self.kwargs['title_id'])
+        return self.get_title().reviews.all()
+
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs['title_id'])
 
 
 class CommentViewSet(viewsets.ModelViewSet):

@@ -1,9 +1,8 @@
 import datetime as dt
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Category, Genre, Title, Review, Comment
+
 
 # region Titles
 class TitleSerializer(serializers.ModelSerializer):
@@ -52,13 +51,15 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('title', 'author'),
-                message='The review already exists.'
-            )
-        ]
+
+    def validate(self, attrs):
+        if not self.context.get('request').method == 'POST':
+            return attrs
+        author = self.context.get('request').user
+        title_id = self.context.get('view').kwargs.get('title_id')
+        if Review.objects.filter(author=author, title=title_id).exists():
+            raise serializers.ValidationError('The review already exists.')
+        return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):
