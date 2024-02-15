@@ -12,11 +12,23 @@ MAX_COMMENT_LENGTH = 50
 
 
 class Category(AbstractCategoryGenreModel):
-    pass
+
+    class Meta(AbstractCategoryGenreModel.Meta):
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return self.slug
 
 
 class Genre(AbstractCategoryGenreModel):
-    pass
+
+    class Meta(AbstractCategoryGenreModel.Meta):
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.slug
 
 
 class Title(models.Model):
@@ -31,6 +43,13 @@ class Title(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True
     )
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
+
+    def __str__(self):
+        return self.name
 
     def get_rating(self):
         rating_avg = self.reviews.aggregate(rating=models.Avg('score'))['rating']
