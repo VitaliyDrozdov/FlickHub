@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 
 from api_users.serializers import UserSerializer, SignupSerializer
-from api_users.permissions import IsAdminOnly
+# from api_users.permissions import IsAdminOnly
 
 User = get_user_model()
 

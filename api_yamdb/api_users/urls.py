@@ -1,8 +1,6 @@
-from django.urls import include, path
-from rest_framework import routers
+from django.urls import path
 
-from api_users.views import UserViewSet, SignUpView, AccessView
-
+from api_users.views import SignUpView, AccessView
 
 urlpatterns = [
     path('signup/', SignUpView.as_view(), name='signup'),

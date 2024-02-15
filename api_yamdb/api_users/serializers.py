@@ -34,6 +34,7 @@ class SignupSerializer(serializers.ModelSerializer):
             defaults={'username': validated_data['username']}
         )
         return user
+
     class Meta:
         model = User
         fields = ('email', 'username',)
