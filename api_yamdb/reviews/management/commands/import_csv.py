@@ -18,7 +18,7 @@ class Command(BaseCommand):
         path = options['path']
         model = apps.get_model(app_label='reviews',
                                model_name=options['model_name'])
-        with open(path, 'r') as imported_csv:
+        with open(path, 'r', encoding='utf-8') as imported_csv:
             reader = csv.reader(imported_csv)
             header = next(reader)
             for row in reader:
