@@ -17,18 +17,12 @@ class Category(AbstractCategoryGenreModel):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
-    def __str__(self):
-        return self.slug
-
 
 class Genre(AbstractCategoryGenreModel):
 
     class Meta(AbstractCategoryGenreModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-
-    def __str__(self):
-        return self.slug
 
 
 class Title(models.Model):
