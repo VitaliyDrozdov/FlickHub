@@ -40,17 +40,6 @@ class SignUpView(APIView):
                 self.send_confirmation_email(user)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-        # if serializer.is_valid():
-        #     send_mail(
-        #         subject='Confirmation Code',
-        #         message=f'Your confirmation code is: {confirmation_code}',
-        #         from_email='from@example.com',
-        #         recipient_list=[user.email],
-        #         fail_silently=True
-        #     )
-        #     return Response(serializer.data, status=status.HTTP_200_OK)
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
