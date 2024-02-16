@@ -44,7 +44,7 @@ class SignUpView(APIView):
         if User.objects.filter(username=request.data.get('username'), email=request.data.get('email')).exists():
             user = User.objects.get(username=request.data['username'], email=request.data['email'])
             self.send_confirmation_email(user)
-            return Response({"detail": "Пользватель уже существует. Новый сonfirmation_code отаправлен на почту."}, status=status.HTTP_200_OK)
+            return Response({"detail": "Пользователь уже существует. Новый сonfirmation_code отправлен на почту."}, status=status.HTTP_200_OK)
         else:
             if serializer.is_valid():
                 user = serializer.save()
