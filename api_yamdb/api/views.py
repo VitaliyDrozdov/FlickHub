@@ -11,6 +11,7 @@ from api.serializers import (
     ReviewSerializer,
     CommentSerializer,
 )
+from api.filters import TitleFilterSet
 from api.permissions import AdminOrReadOnly
 from reviews.models import Category, Genre, Title, Review
 
@@ -18,10 +19,9 @@ from reviews.models import Category, Genre, Title, Review
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     http_method_names = ['get', 'post', 'patch', 'delete']
-    pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category', 'genre', 'name', 'year')
+    filterset_class = TitleFilterSet
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -35,7 +35,6 @@ class CategoryGenreViewSet(
 ):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
     lookup_field = 'slug'
 
