@@ -2,16 +2,13 @@
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
-from django.utils.crypto import get_random_string
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 from rest_framework import filters, permissions, viewsets, status
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.permissions import AllowAny
-
 
 from api_users.serializers import UserSerializer, SignUpSerializer
 from api_users.permissions import IsAdminOnly, IsCurrentUserOnly
@@ -24,12 +21,6 @@ class SignUpView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # user, created = User.objects.get_or_create(
-        #         email=request.data['email'],
-        #         username=request.data['username']
-        #     )
-        # if not created:
-        #     serializer.save()
         if not User.objects.filter(username=request.data['username'],
                                email=request.data['email']).exists():
             serializer.save()
