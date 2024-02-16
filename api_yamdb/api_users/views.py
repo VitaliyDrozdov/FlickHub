@@ -20,21 +20,22 @@ class SignUpView(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = SignUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if not User.objects.filter(username=request.data['username'],
+        if serializer.is_valid():
+            if not User.objects.filter(username=request.data['username'],
                                email=request.data['email']).exists():
-            serializer.save()
-        user = User.objects.get(username=request.data['username'],
+                serializer.save()
+            user = User.objects.get(username=request.data['username'],
                             email=request.data['email'])
-        confirmation_code = default_token_generator.make_token(user)
-        send_mail(
+            confirmation_code = default_token_generator.make_token(user)
+            send_mail(
                 subject='Confirmation Code',
                 message=f'Your confirmation code is: {confirmation_code}',
                 from_email='from@example.com',
                 recipient_list=[user.email],
                 fail_silently=True
             )
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -52,14 +53,12 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = self.get_serializer(profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = self.get_serializer(profile, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
+        elif request.method == 'PATCH':
+            serializer = self.get_serializer(profile, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def update(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class AccessView(APIView):
@@ -69,7 +68,5 @@ class AccessView(APIView):
         username = request.data.get('username')
         confirmation_code = request.data.get('confirmation_code')
         user = authenticate(username=username, confirmation_code=confirmation_code)
-        # if user is None:
-        #     return Response({'error': 'Invalid username or confirmation code'}, status=status.HTTP_400_BAD_REQUEST)
         access_token = AccessToken.for_user(user)
         return Response({'access_token': str(access_token)}, status=status.HTTP_200_OK)
