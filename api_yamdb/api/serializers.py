@@ -1,11 +1,35 @@
-import datetime as dt
 from rest_framework import serializers
 
 from reviews.models import Category, Genre, Title, Review, Comment
 
 
 # region Titles
-class TitleSerializer(serializers.ModelSerializer):
+class CategoryForTitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+
+
+class GenreForTitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    genre = GenreForTitleSerializer(many=True)
+    category = CategoryForTitleSerializer()
+    rating = serializers.IntegerField(read_only=True, source='get_rating')
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
+                  'category')
+
+
+class TitlePostPatchSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(many=True, slug_field='slug',
                                          queryset=Genre.objects.all())
     category = serializers.SlugRelatedField(slug_field='slug',
@@ -17,24 +41,24 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
                   'category')
 
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError('год выпуска не может быть'
-                                              'больше текущего')
-        return value
 
+class CategoryGenreSerializer(serializers.ModelSerializer):
 
-class CategorySerializer(serializers.ModelSerializer):
     class Meta:
+        fields = ('id', 'name', 'slug')
+        lookup_field = 'slug'
+
+
+class CategorySerializer(CategoryGenreSerializer):
+
+    class Meta(CategoryGenreSerializer.Meta):
         model = Category
-        fields = ('id', 'name', 'slug')
 
 
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
+class GenreSerializer(CategoryGenreSerializer):
+
+    class Meta(CategoryGenreSerializer.Meta):
         model = Genre
-        fields = ('id', 'name', 'slug')
 
 
 # endregion
