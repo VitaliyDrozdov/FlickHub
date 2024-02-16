@@ -1,9 +1,13 @@
 from rest_framework import permissions
 
 class IsAdminOnly(permissions.BasePermission):
-    """
-    Пользователи с ролью администратора имеют полный доступ.
-    """
+
     def has_permission(self, request, view):
-        # Только администраторы могут выполнять другие действия
-        return request.user.role == 'admin'
+        return (request.user.is_authenticated and (request.user.is_admin or request.user.is_staff or request.user.is_superuser))
+
+    def has_object_permission(self, request, view, obj):
+        return (request.user.is_authenticated and (request.user.is_admin or request.user.is_staff or request.user.is_superuser))
+
+class IsCurrentUserOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return (request.user.is_authenticated and obj.user == request.user)

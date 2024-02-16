@@ -1,16 +1,21 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
 # based permisson class for Admin, could be changed
-class AdminOrReadOnly(permissions.BasePermission):
+class AdminOrReadOnly(BasePermission):
 
     def has_permission(self, request, view):
         return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.role == 'admin'
+            request.method in SAFE_METHODS
+            or request.user.is_admin
         )
 
     def has_object_permission(self, request, view, obj):
-        if request.method == "GET":
-            return True
-        return request.user.role == 'admin'
+            return request.method == "GET" or request.user.is_admin
+
+
+class IsReadOnly(BasePermission):
+
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
+        
