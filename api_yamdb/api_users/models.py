@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 USER = 'user'
 MODERATOR = 'moderator'
@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(blank=False, unique=True)
     bio = models.TextField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=30, choices=ROLES, default='user')
+    confirmation_code = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         verbose_name = ('пользователь')
