@@ -11,7 +11,7 @@ ROLES = (
         (MODERATOR, 'Модератор'),
     )
 class CustomUser(AbstractUser):
-    email = models.EmailField(blank=False)
+    email = models.EmailField(blank=False, unique=True)
     bio = models.TextField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=30, choices=ROLES, default='user')
 

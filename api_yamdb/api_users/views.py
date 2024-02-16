@@ -18,24 +18,39 @@ User = get_user_model()
 class SignUpView(APIView):
     permission_classes = (permissions.AllowAny,)
 
+    def send_confirmation_email(self, user):
+        confirmation_code = default_token_generator.make_token(user)
+        send_mail(
+            subject='Confirmation Code',
+            message=f'Your confirmation code is: {confirmation_code}',
+            from_email='from@example.com',
+            recipient_list=[user.email],
+            fail_silently=True
+        )
+
     def post(self, request, *args, **kwargs):
         serializer = SignUpSerializer(data=request.data)
-        if serializer.is_valid():
-            if not User.objects.filter(username=request.data['username'],
-                               email=request.data['email']).exists():
-                serializer.save()
-            user = User.objects.get(username=request.data['username'],
-                            email=request.data['email'])
-            confirmation_code = default_token_generator.make_token(user)
-            send_mail(
-                subject='Confirmation Code',
-                message=f'Your confirmation code is: {confirmation_code}',
-                from_email='from@example.com',
-                recipient_list=[user.email],
-                fail_silently=True
-            )
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(username=request.data.get('username'), email=request.data.get('email')).exists():
+            user = User.objects.get(username=request.data['username'], email=request.data['email'])
+            self.send_confirmation_email(user)
+            return Response({"detail": "User already exists. Confirmation email sent."}, status=status.HTTP_200_OK)
+        else:
+            if serializer.is_valid():
+                user = serializer.save()
+                self.send_confirmation_email(user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        # if serializer.is_valid():
+        #     send_mail(
+        #         subject='Confirmation Code',
+        #         message=f'Your confirmation code is: {confirmation_code}',
+        #         from_email='from@example.com',
+        #         recipient_list=[user.email],
+        #         fail_silently=True
+        #     )
+        #     return Response(serializer.data, status=status.HTTP_200_OK)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
