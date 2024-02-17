@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 
 USER = 'user'
@@ -13,20 +14,17 @@ ROLES = (
 
 
 class CustomUser(AbstractUser):
+    username_validator = UnicodeUsernameValidator()
+    username = models.CharField(max_length=150, unique=True, blank=False,
+                                validators=[username_validator])
     email = models.EmailField(blank=False, unique=True)
-    bio = models.TextField(max_length=255, blank=True, null=True)
+    bio = models.TextField(max_length=255, blank=True, null=False)
     role = models.CharField(max_length=30, choices=ROLES, default='user')
-    confirmation_code = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         verbose_name = ('пользователь')
         verbose_name_plural = ('Пользователи')
-        constraints = (
-            models.UniqueConstraint(
-                fields=('username', 'email',),
-                name='unique_user'
-            ),
-        )
+        ordering = ('id',)
 
     @property
     def is_moderator(self):

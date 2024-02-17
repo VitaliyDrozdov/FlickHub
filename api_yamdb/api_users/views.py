@@ -20,12 +20,8 @@ class SignUpView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def send_confirmation_email(self, user):
-        """
-        Отправляет confirmation_code пользователю и сохраняет его в БД.
-        """
+        """Отправляет confirmation_code пользователю и сохраняет его в БД."""
         confirmation_code = default_token_generator.make_token(user)
-        user.confirmation_code = confirmation_code
-        user.save()
         send_mail(
             subject='Confirmation Code',
             message=f'Your confirmation code is: {confirmation_code}',
@@ -36,9 +32,8 @@ class SignUpView(APIView):
 
     def post(self, request, *args, **kwargs):
         """
-       Проверяет, существует ли пользователь в БД. Если да, то получает объект
-       пользователя и отправляет confirmation_code на email; Если не существует
-       - создает нового пользователи и отправляет confirmation_code на email.
+        Проверяет, существует ли пользователь в БД, 
+        отправляет confirmation_code на email.
         """
         serializer = SignUpSerializer(data=request.data)
         if User.objects.filter(username=request.data.get('username'),
@@ -46,37 +41,23 @@ class SignUpView(APIView):
             user = User.objects.get(username=request.data['username'],
                                     email=request.data['email'])
             self.send_confirmation_email(user)
-            return Response({"detail": "Пользователь уже существует. Новый"
-                            "сonfirmation_code отправлен на почту."},
-                            status=status.HTTP_200_OK)
-        else:
-            if serializer.is_valid():
-                user = serializer.save()
-                self.send_confirmation_email(user)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.initial_data, status=status.HTTP_200_OK)
+        if serializer.is_valid():
+            user = serializer.save()
+            self.send_confirmation_email(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AccessView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        """
-        Проверяет, передан ли username в request. Создает access_token
-        для пользователя.
-        """
-        username = request.data.get('username')
-        # Тут костыль, нужно попробовать перенести в модель или сериализатор
-        # проверку username:
-        if not username:
-            return Response({'error': 'Username is required.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        serializer = TokenSerializer(data=request.data,
-                                     context={'username': username})
-        if serializer.is_valid(raise_exception=True):
+        """Создает access_token для пользователя."""
+        serializer = TokenSerializer(data=request.data)
+        if serializer.is_valid():
             user = get_object_or_404(
-                User, username=serializer.validated_data['username']
+                User, username=serializer.validated_data.get('username')
             )
             access_token = AccessToken.for_user(user)
             return Response({'token': str(access_token)},
