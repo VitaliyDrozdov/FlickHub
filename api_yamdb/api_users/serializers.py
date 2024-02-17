@@ -33,14 +33,15 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.ModelSerializer):
 
-    def validate_confirmation_code(self, value):
-        username = self.context.get('username')
-        user = get_object_or_404(User, username=username)
-        check = default_token_generator.check_token(user, value)
-        if not check:
-            raise ValidationError('Неверный код подтверждения')
-        return value
+    username = serializers.CharField(max_length=150, allow_blank=False)
+
+    def validate(self, attrs):
+        user = get_object_or_404(User, username=attrs.get('username'))
+        confirmation_code = default_token_generator.make_token(user)
+        if confirmation_code != attrs.get('confirmation_code'):
+            raise ValidationError('Неверный код подтвеждения.')
+        return attrs
 
     class Meta:
         model = User
-        fields = ('username', 'confirmation_code',)
+        fields = ('username',)
