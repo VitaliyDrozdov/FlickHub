@@ -45,7 +45,7 @@ class TitlePostPatchSerializer(serializers.ModelSerializer):
 class CategoryGenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('id', 'name', 'slug')
+        fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
