@@ -1,26 +1,31 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 # region Titles
-class CategoryForTitleSerializer(serializers.ModelSerializer):
+class CategoryGenreSerializer(serializers.ModelSerializer):
 
     class Meta:
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
+class CategorySerializer(CategoryGenreSerializer):
+
+    class Meta(CategoryGenreSerializer.Meta):
         model = Category
-        fields = ('name', 'slug')
 
 
-class GenreForTitleSerializer(serializers.ModelSerializer):
+class GenreSerializer(CategoryGenreSerializer):
 
-    class Meta:
+    class Meta(CategoryGenreSerializer.Meta):
         model = Genre
-        fields = ('name', 'slug')
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
-    genre = GenreForTitleSerializer(many=True)
-    category = CategoryForTitleSerializer()
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
     rating = serializers.IntegerField(read_only=True, source='get_rating')
 
     class Meta:
@@ -40,25 +45,6 @@ class TitlePostPatchSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
                   'category')
-
-
-class CategoryGenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ('name', 'slug')
-        lookup_field = 'slug'
-
-
-class CategorySerializer(CategoryGenreSerializer):
-
-    class Meta(CategoryGenreSerializer.Meta):
-        model = Category
-
-
-class GenreSerializer(CategoryGenreSerializer):
-
-    class Meta(CategoryGenreSerializer.Meta):
-        model = Genre
 
 
 # endregion

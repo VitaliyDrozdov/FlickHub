@@ -5,14 +5,19 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 User = get_user_model()
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        fields = ('username', 'email', 'first_name', 'last_name', 'bio',
+                  'role')
+
 
 class UserProfileSerializer(UserSerializer):
     role = serializers.CharField(read_only=True)
+
 
 class SignUpSerializer(serializers.ModelSerializer):
 
@@ -20,9 +25,11 @@ class SignUpSerializer(serializers.ModelSerializer):
         if value.lower() == 'me':
             raise ValidationError("Username 'me' is not allowed.")
         return value
+
     class Meta:
         model = User
         fields = ('email', 'username',)
+
 
 class TokenSerializer(serializers.ModelSerializer):
 
@@ -33,6 +40,7 @@ class TokenSerializer(serializers.ModelSerializer):
         if not check:
             raise ValidationError('Неверный код подтверждения')
         return value
+
     class Meta:
         model = User
         fields = ('username', 'confirmation_code',)

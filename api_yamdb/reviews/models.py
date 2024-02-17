@@ -47,7 +47,9 @@ class Title(models.Model):
         return self.name
 
     def get_rating(self):
-        rating_avg = self.reviews.aggregate(rating=models.Avg('score'))['rating']
+        rating_avg = self.reviews.aggregate(
+            rating=models.Avg('score')
+        )['rating']
         return None if rating_avg is None else int(rating_avg)
 
 
@@ -66,7 +68,8 @@ class Review(AbstractReviewModel):
         ],
     )
     title = models.ForeignKey(
-        Title, verbose_name='Название', on_delete=models.CASCADE, related_name='reviews'
+        Title, verbose_name='Название', on_delete=models.CASCADE,
+        related_name='reviews'
     )
 
     class Meta(AbstractReviewModel.Meta):
@@ -85,7 +88,8 @@ class Review(AbstractReviewModel):
 class Comment(AbstractReviewModel):
     text = models.TextField('Комментарий')
     review = models.ForeignKey(
-        Review, verbose_name='Обзор', on_delete=models.CASCADE, related_name='comments'
+        Review, verbose_name='Обзор', on_delete=models.CASCADE,
+        related_name='comments'
     )
 
     class Meta(AbstractReviewModel.Meta):
