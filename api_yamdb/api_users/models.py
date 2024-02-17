@@ -25,12 +25,6 @@ class CustomUser(AbstractUser):
         verbose_name = ('пользователь')
         verbose_name_plural = ('Пользователи')
         ordering = ('id',)
-        constraints = (
-            models.UniqueConstraint(
-                fields=('username', 'email',),
-                name='unique_user'
-            ),
-        )
 
     @property
     def is_moderator(self):

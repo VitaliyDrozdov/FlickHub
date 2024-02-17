@@ -42,7 +42,6 @@ class SignUpView(APIView):
                                     email=request.data['email'])
             self.send_confirmation_email(user)
             return Response(serializer.initial_data, status=status.HTTP_200_OK)
-
         if serializer.is_valid():
             user = serializer.save()
             self.send_confirmation_email(user)
