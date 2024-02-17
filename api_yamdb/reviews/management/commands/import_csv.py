@@ -4,9 +4,11 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = ('import csv to our database: use PATH and MODEL_NAME,'
-            'request example: '
-            'python3 manage.py import_csv -p static/data/category.csv -m category')
+    help = (
+        'import csv to our database: use PATH and MODEL_NAME,'
+        'request example: '
+        'python3 manage.py import_csv -p static/data/category.csv -m category'
+    )
 
     def add_arguments(self, parser):
         parser.add_argument('-p', '--path', type=str,

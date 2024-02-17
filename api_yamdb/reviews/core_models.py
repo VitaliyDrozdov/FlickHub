@@ -7,7 +7,8 @@ SLUG_MAX_LENGTH = 50
 
 
 class AbstractReviewModel(models.Model):
-    author = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, verbose_name='Пользователь',
+                               on_delete=models.CASCADE)
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
