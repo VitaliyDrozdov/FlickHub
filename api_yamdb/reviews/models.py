@@ -48,7 +48,7 @@ class Title(models.Model):
 
     def get_rating(self):
         rating_avg = self.reviews.aggregate(rating=models.Avg('score'))['rating']
-        return 0 if rating_avg is None else int(rating_avg)
+        return None if rating_avg is None else int(rating_avg)
 
 
 class GenreTitle(models.Model):
