@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from api_users.permissions import IsAdminOnly, IsCurrentUserOnly
 from api_users.serializers import (SignUpSerializer, TokenSerializer,
-                                   UserSerializer)
+                                   UserSerializer, UserProfileSerializer)
 
 User = get_user_model()
 
@@ -60,6 +60,7 @@ class AccessView(APIView):
         Проверяет, передан ли username в request. Создает access_token для пользователя.
         """
         username = request.data.get('username')
+        # Тут костыль, нужно попробовать перенести в модель или сериализатор проверку username:
         if not username:
             return Response({'error': 'Username is required.'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = TokenSerializer(data=request.data, context={'username': username})
@@ -68,6 +69,7 @@ class AccessView(APIView):
             access_token = AccessToken.for_user(user)
             return Response({'token': str(access_token)}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -76,6 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     lookup_field = 'username'
     permission_classes = (IsAdminOnly,)
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options', 'trace']
 
 
     @action(detail=False, methods=['get', 'patch'], url_path='me', permission_classes=(IsCurrentUserOnly,))
@@ -84,11 +87,8 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = self.get_serializer(profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        elif request.method == 'PATCH':
-            serializer = self.get_serializer(profile, data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-

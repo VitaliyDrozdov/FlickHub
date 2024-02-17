@@ -12,14 +12,14 @@ from api.serializers import (
     CommentSerializer,
 )
 from api.filters import TitleFilterSet
-from api.permissions import AdminOrReadOnly
+from api.permissions import IsAdminOrReadOnly,IsAuthorModeratorAdminOrReadOnly
 from reviews.models import Category, Genre, Title, Review
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     http_method_names = ['get', 'post', 'patch', 'delete']
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
 
@@ -35,7 +35,7 @@ class CategoryGenreViewSet(
 ):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     lookup_field = 'slug'
 
 
