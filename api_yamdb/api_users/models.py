@@ -9,7 +9,9 @@ ROLES = (
         (ADMIN, 'Администратор'),
         (USER, 'Аутентифицированный пользователь'),
         (MODERATOR, 'Модератор'),
-    )
+)
+
+
 class CustomUser(AbstractUser):
     email = models.EmailField(blank=False, unique=True)
     bio = models.TextField(max_length=255, blank=True, null=True)
@@ -25,6 +27,7 @@ class CustomUser(AbstractUser):
                 name='unique_user'
             ),
         )
+
     @property
     def is_moderator(self):
         return self.role == MODERATOR
@@ -36,6 +39,6 @@ class CustomUser(AbstractUser):
     @property
     def is_user(self):
         return self.role == USER
+
     def __str__(self) -> str:
         return self.username
-    
