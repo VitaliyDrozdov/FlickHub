@@ -11,6 +11,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
 
+class UserProfileSerializer(UserSerializer):
+    role = serializers.CharField(read_only=True)
 
 class SignUpSerializer(serializers.ModelSerializer):
 
