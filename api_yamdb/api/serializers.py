@@ -72,11 +72,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
     def validate(self, attrs):
-        if not self.context.get('request').method == 'POST':
+        request = self.context['request']
+        if not request.method == 'POST':
             return attrs
-        author = self.context.get('request').user
-        title_id = self.context.get('view').kwargs.get('title_id')
-        if Review.objects.filter(author=author, title=title_id).exists():
+        title_id = self.context['view'].kwargs['title_id']
+        if Review.objects.filter(author=request.user, title=title_id).exists():  # TODO: какая-то ссылка в ревью
             raise serializers.ValidationError('The review already exists.')
         return attrs
 
