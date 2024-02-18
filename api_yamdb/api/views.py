@@ -52,7 +52,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title=self.get_title())
 
     def get_queryset(self):
-        # return Review.objects.filter(title=self.kwargs['title_id'])
         return self.get_title().reviews.all()
 
     def get_title(self):
