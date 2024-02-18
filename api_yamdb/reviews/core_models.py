@@ -7,8 +7,9 @@ SLUG_MAX_LENGTH = 50
 
 
 class AbstractReviewModel(models.Model):
-    author = models.ForeignKey(User, verbose_name='Пользователь',
-                               on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        User, verbose_name='Пользователь', on_delete=models.CASCADE
+    )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
@@ -17,8 +18,9 @@ class AbstractReviewModel(models.Model):
 
 
 class AbstractCategoryGenreModel(models.Model):
-    name = models.CharField(max_length=NAMES_MAX_LENGTH)
+    name = models.CharField('Название', max_length=NAMES_MAX_LENGTH)
     slug = models.SlugField(
+        'Слаг',
         unique=True,
         max_length=SLUG_MAX_LENGTH,
     )

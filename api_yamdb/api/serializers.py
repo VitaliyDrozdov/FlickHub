@@ -4,47 +4,58 @@ from reviews.models import Category, Comment, Genre, Review, Title
 
 
 # region Titles
-class CategoryGenreSerializer(serializers.ModelSerializer):
-
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
+        model = Category
         fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
-class CategorySerializer(CategoryGenreSerializer):
-
-    class Meta(CategoryGenreSerializer.Meta):
-        model = Category
-
-
-class GenreSerializer(CategoryGenreSerializer):
-
-    class Meta(CategoryGenreSerializer.Meta):
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
         model = Genre
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
-    rating = serializers.IntegerField(read_only=True, source='get_rating')
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
-                  'category')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category',
+        )
 
 
 class TitlePostPatchSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(many=True, slug_field='slug',
-                                         queryset=Genre.objects.all())
-    category = serializers.SlugRelatedField(slug_field='slug',
-                                            queryset=Category.objects.all())
-    rating = serializers.IntegerField(read_only=True, source='get_rating')
+    genre = serializers.SlugRelatedField(
+        many=True, slug_field='slug', queryset=Genre.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all()
+    )
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
-                  'category')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category',
+        )
 
 
 # endregion

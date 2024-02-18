@@ -7,23 +7,26 @@ MODERATOR = 'moderator'
 ADMIN = 'admin'
 
 ROLES = (
-        (ADMIN, 'Администратор'),
-        (USER, 'Аутентифицированный пользователь'),
-        (MODERATOR, 'Модератор'),
+    (ADMIN, 'Администратор'),
+    (USER, 'Аутентифицированный пользователь'),
+    (MODERATOR, 'Модератор'),
 )
 
 
 class CustomUser(AbstractUser):
-    username_validator = UnicodeUsernameValidator()
-    username = models.CharField(max_length=150, unique=True, blank=False,
-                                validators=[username_validator])
-    email = models.EmailField(blank=False, unique=True)
-    bio = models.TextField(max_length=255, blank=True, null=False)
-    role = models.CharField(max_length=30, choices=ROLES, default='user')
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        blank=False,
+        validators=[UnicodeUsernameValidator()],
+    )
+    email = models.EmailField(unique=True)
+    bio = models.TextField('Биография', max_length=255, blank=True)
+    role = models.CharField('Роль', max_length=30, choices=ROLES, default=USER)
 
     class Meta:
-        verbose_name = ('пользователь')
-        verbose_name_plural = ('Пользователи')
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'Пользователи'
         ordering = ('id',)
 
     @property
