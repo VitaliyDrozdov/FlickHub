@@ -3,7 +3,6 @@ from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
 
 
-# region Titles
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -57,11 +56,10 @@ class TitlePostPatchSerializer(serializers.ModelSerializer):
             'category',
         )
 
+    def to_representation(self, instance):
+        return TitleGetSerializer(instance).data
 
-# endregion
 
-
-# region Review
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
@@ -74,11 +72,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
     def validate(self, attrs):
-        if not self.context.get('request').method == 'POST':
+        request = self.context['request']
+        if not request.method == 'POST':
             return attrs
-        author = self.context.get('request').user
-        title_id = self.context.get('view').kwargs.get('title_id')
-        if Review.objects.filter(author=author, title=title_id).exists():
+        title_id = self.context['view'].kwargs['title_id']
+        if request.user.reviews.filter(title_id=title_id).exists():
             raise serializers.ValidationError('The review already exists.')
         return attrs
 
@@ -93,6 +91,3 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-
-
-# endregion

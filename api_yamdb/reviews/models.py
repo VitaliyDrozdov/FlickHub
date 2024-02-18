@@ -27,6 +27,7 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField(
         'Год',
         validators=[year_validator],
+        db_index=True,
     )
     description = models.TextField('Описание', blank=True)
     genre = models.ManyToManyField(Genre, verbose_name='Жанры',
@@ -46,8 +47,10 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    title = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True)
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
+    title = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True,
+                              verbose_name='Произведения')
+    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True,
+                              verbose_name='Жанры')
 
 
 class Review(AbstractReviewModel):
@@ -60,12 +63,12 @@ class Review(AbstractReviewModel):
         Title,
         verbose_name='Название',
         on_delete=models.CASCADE,
-        related_name='reviews',
     )
 
     class Meta(AbstractReviewModel.Meta):
         verbose_name = 'Обзор'
         verbose_name_plural = 'Обзоры'
+        default_related_name = 'reviews'
         constraints = [
             models.UniqueConstraint(
                 fields=('title', 'author'), name='unique_title_review'
@@ -82,12 +85,12 @@ class Comment(AbstractReviewModel):
         Review,
         verbose_name='Обзор',
         on_delete=models.CASCADE,
-        related_name='comments',
     )
 
     class Meta(AbstractReviewModel.Meta):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        default_related_name = 'comments'
 
     def __str__(self):
         return self.text[:MAX_COMMENT_LENGTH]

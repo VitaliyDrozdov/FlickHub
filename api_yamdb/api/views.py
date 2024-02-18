@@ -16,8 +16,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = TitleFilterSet
+    ordering_fields = ('name', 'year')
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -51,7 +52,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title=self.get_title())
 
     def get_queryset(self):
-        # return Review.objects.filter(title=self.kwargs['title_id'])
         return self.get_title().reviews.all()
 
     def get_title(self):
