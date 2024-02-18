@@ -76,7 +76,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         if not request.method == 'POST':
             return attrs
         title_id = self.context['view'].kwargs['title_id']
-        if Review.objects.filter(author=request.user, title=title_id).exists():  # TODO: какая-то ссылка в ревью
+        if request.user.reviews.filter(title_id=title_id).exists():
             raise serializers.ValidationError('The review already exists.')
         return attrs
 
