@@ -3,7 +3,6 @@ from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
 
 
-# region Titles
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -57,11 +56,10 @@ class TitlePostPatchSerializer(serializers.ModelSerializer):
             'category',
         )
 
+    def to_representation(self, instance):
+        return TitleGetSerializer(instance).data
 
-# endregion
 
-
-# region Review
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
@@ -93,6 +91,3 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-
-
-# endregion

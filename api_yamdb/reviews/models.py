@@ -27,6 +27,7 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField(
         'Год',
         validators=[year_validator],
+        db_index=True,
     )
     description = models.TextField('Описание', blank=True)
     genre = models.ManyToManyField(Genre, verbose_name='Жанры',
@@ -46,8 +47,10 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    title = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True)
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
+    title = models.ForeignKey(Title, on_delete=models.SET_NULL, null=True,
+                              verbose_name='Произведения')
+    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True,
+                              verbose_name='Жанры')
 
 
 class Review(AbstractReviewModel):

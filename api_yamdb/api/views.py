@@ -1,6 +1,6 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import filters, viewsets
 
 from api.filters import TitleFilterSet
@@ -16,8 +16,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = TitleFilterSet
+    ordering_fields = ('name', 'year')
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
