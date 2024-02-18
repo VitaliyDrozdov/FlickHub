@@ -8,11 +8,16 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio',
-                  'role')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
+        )
 
 
 class UserProfileSerializer(UserSerializer):
@@ -20,10 +25,9 @@ class UserProfileSerializer(UserSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-
     def validate_username(self, value):
         if value.lower() == 'me':
-            raise ValidationError("Username 'me' is not allowed.")
+            raise ValidationError('Username \'me\' is not allowed.')
         return value
 
     class Meta:
@@ -32,7 +36,6 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class TokenSerializer(serializers.ModelSerializer):
-
     username = serializers.CharField(max_length=150, allow_blank=False)
 
     def validate(self, attrs):
