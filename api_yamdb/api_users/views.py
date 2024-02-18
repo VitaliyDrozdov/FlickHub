@@ -49,10 +49,12 @@ class SignUpView(APIView):
             self.send_confirmation_email(user)
             return Response(serializer.initial_data, status=status.HTTP_200_OK)
 
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             user = serializer.save()
             self.send_confirmation_email(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AccessView(APIView):
@@ -61,12 +63,15 @@ class AccessView(APIView):
     def post(self, request, *args, **kwargs):
         """Создает access_token для пользователя."""
         serializer = TokenSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             user = get_object_or_404(
                 User, username=serializer.validated_data.get('username')
             )
             access_token = AccessToken.for_user(user)
-            return Response({'token': access_token})
+            return Response(
+                {'token': str(access_token)}, status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -100,6 +105,8 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserProfileSerializer(
             self.request.user, data=request.data, partial=True
         )
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
