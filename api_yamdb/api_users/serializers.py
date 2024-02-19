@@ -30,7 +30,9 @@ class UserProfileSerializer(UserSerializer):
 
 class SignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254, required=True)
-    username = serializers.CharField(max_length=150, required=True, validators=[UnicodeUsernameValidator()])
+    username = serializers.CharField(
+        max_length=150, required=True, validators=[UnicodeUsernameValidator()]
+    )
 
     def send_confirmation_email(self, user):
         """Отправляет confirmation_code пользователю."""
