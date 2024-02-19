@@ -131,3 +131,5 @@ SIMPLE_JWT = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+DOMAIN_NAME = 'example.com'
+EMAIL_SENDER = f'noreply@{DOMAIN_NAME}'
