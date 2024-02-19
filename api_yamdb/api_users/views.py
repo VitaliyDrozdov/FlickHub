@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.db.models import Q
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -23,38 +21,21 @@ User = get_user_model()
 class SignUpView(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def send_confirmation_email(self, user):
-        """Отправляет confirmation_code пользователю и сохраняет его в БД."""
-        confirmation_code = default_token_generator.make_token(user)
-        send_mail(
-            subject='Confirmation Code',
-            message=f'Your confirmation code is: {confirmation_code}',
-            from_email='from@example.com',
-            recipient_list=[user.email],
-            fail_silently=True,
-        )
-
     def post(self, request, *args, **kwargs):
-        """
-        Проверяет, существует ли пользователь в БД,
-        отправляет confirmation_code на email.
-        """
         serializer = SignUpSerializer(data=request.data)
-        user_query = Q(
-            username=request.data.get('username'),
-            email=request.data.get('email'),
-        )
-        if User.objects.filter(user_query).exists():
-            user = User.objects.get(user_query)
-            self.send_confirmation_email(user)
-            return Response(serializer.initial_data, status=status.HTTP_200_OK)
-
-        if serializer.is_valid():
-            user = serializer.save()
-            self.send_confirmation_email(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        try:
+            user, created = User.objects.get_or_create(
+                **serializer.validated_data
+            )
+        except IntegrityError:
+            return Response(
+                {"username": "пользователь с таким username уже существует.",
+                 "email": "пользователь с таким email уже существует."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.send_confirmation_email(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AccessView(APIView):
@@ -63,15 +44,14 @@ class AccessView(APIView):
     def post(self, request, *args, **kwargs):
         """Создает access_token для пользователя."""
         serializer = TokenSerializer(data=request.data)
-        if serializer.is_valid():
-            user = get_object_or_404(
-                User, username=serializer.validated_data.get('username')
-            )
-            access_token = AccessToken.for_user(user)
-            return Response(
-                {'token': str(access_token)}, status=status.HTTP_200_OK
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(
+            User, username=serializer.validated_data.get('username')
+        )
+        access_token = AccessToken.for_user(user)
+        return Response(
+            {'token': str(access_token)}, status=status.HTTP_200_OK
+        )
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -105,8 +85,6 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserProfileSerializer(
             self.request.user, data=request.data, partial=True
         )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
