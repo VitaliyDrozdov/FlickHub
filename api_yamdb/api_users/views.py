@@ -26,7 +26,7 @@ class SignUpView(APIView):
         serializer.is_valid(raise_exception=True)
         try:
             user, created = User.objects.get_or_create(
-            **serializer.validated_data
+                **serializer.validated_data
             )
         except IntegrityError:
             return Response(
