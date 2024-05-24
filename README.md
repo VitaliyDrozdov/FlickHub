@@ -87,10 +87,10 @@ pip install -r requirements.txt
 ## Использованные технологии:
 - Python
 - Django
-- Django REST Framework
+- Django REST framework
 
 
 ## Информация об авторах:
 - Кирилл Воробьев
-- Виталий Дроздов
+- Виталий Дроздов [VitaliyDrozdov](https://github.com/VitaliyDrozdov)
 - Григорий Грачев
