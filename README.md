@@ -94,3 +94,4 @@ pip install -r requirements.txt
 - Кирилл Воробьев
 - Виталий Дроздов [VitaliyDrozdov](https://github.com/VitaliyDrozdov)
 - Григорий Грачев
+
