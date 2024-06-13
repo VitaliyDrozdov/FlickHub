@@ -1,4 +1,4 @@
-# API for PyMDB app
+# API for FlickHub app
 
 ## О проекте:
 
